@@ -1,5 +1,7 @@
 import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import supabase from "../supabase/supabaseClient";
 
 const CreateKitty = () => {
   const examples = [
@@ -44,14 +46,49 @@ const CreateKitty = () => {
     setValue("example", random);
   };
 
-  const onSubmit = (data) => {
-    console.log("✅ Kitty Data:", data);
+  const onSubmit = async (data) => {
+    try {
+      // 1. Insert event
+      const { data: eventData, error: eventError } = await supabase
+        .from("events")
+        .insert([
+          {
+            event_name: data.eventName,
+            currency: data.currency,
+          },
+        ])
+        .select();
+
+      if (eventError) throw eventError;
+
+      const eventId = eventData[0].id;
+
+      // 2. Insert participants
+      const participants = data.participants.map((p) => ({
+        event_id: eventId,
+        name: p.name,
+        email: p.email || null,
+      }));
+
+      const { error: participantError } = await supabase
+        .from("participants")
+        .insert(participants);
+
+      if (participantError) throw participantError;
+
+      // 3. Redirect to next page with eventId
+      navigate(`/created-kitty/${eventId}`);
+    } catch (err) {
+      console.error("❌ Error:", err.message);
+      alert("Something went wrong!");
+    }
   };
+  const navigate = useNavigate(); // hook for navigation
 
   return (
     <div className="bg-[#dfebed] h-screen flex items-center justify-center py-10 px-12">
-      <div className="container mx-auto rounded-2xl shadow max-w-[750px] bg-[#fffbf2]">
-        <div className="border-b border-[#cdc2af] bg-white rounded-t-2xl">
+      <div className="container mx-auto rounded-2xl shadow2 max-w-[750px] bg-[#fcfbfa]">
+        <div className="border-b border-[#e1dace] bg-white rounded-t-2xl">
           <h1 className="text-2xl font-medium font-raleway px-4 py-4">
             Create a new Kitty
           </h1>
@@ -67,7 +104,7 @@ const CreateKitty = () => {
                 {...register("eventName", {
                   required: "Event name is required",
                 })}
-                className="border border-[#cdc2af]  rounded px-3 py-2 max-w-[322px] shadow-1"
+                className="border border-[#cdc2af]  rounded px-3 py-2 max-w-[322px] shadow1 bg-white font-raleway"
                 placeholder="Ski Trip"
               />
               {errors.eventName && (
@@ -79,12 +116,12 @@ const CreateKitty = () => {
 
             {/* Currency */}
             <div className="flex flex-col space-y-2">
-              <label className="font-light font-sans mb-1">
+              <label className="font-light font-montserrat mb-1">
                 Home Currency{" "}
               </label>
               <select
                 {...register("currency", { required: "Currency is required" })}
-                className="border border-[#cdc2af] rounded px-3 py-2 max-w-[322px] bg-[#ebe6dd]  shadow-1"
+                className="border border-[#cdc2af] rounded px-3 py-2 max-w-[322px] bg-[#ebe6dd] font-raleway focus:outline-none"
               >
                 <option value="INR">INR</option>
                 <option value="USD">USD</option>
@@ -106,13 +143,13 @@ const CreateKitty = () => {
                     {...register(`participants.${index}.name`, {
                       required: "Name is required",
                     })}
-                    className="border border-[#cdc2af] rounded p-2  mb-2  max-w-[322px]"
+                    className="border border-[#cdc2af] rounded p-2  mb-2  max-w-[322px] bg-white shadow1 font-raleway"
                     placeholder={index === 0 ? "Your name" : "Name"}
                   />
                   {index === 0 && (
                     <input
                       {...register(`participants.${index}.email`)}
-                      className="border border-[#cdc2af] rounded p-2 max-w-[322px]"
+                      className="border border-[#cdc2af] rounded p-2 max-w-[322px] bg-white shadow1 font-raleway"
                       placeholder="Your email (recommended)"
                     />
                   )}
@@ -127,7 +164,7 @@ const CreateKitty = () => {
                 <button
                   type="button"
                   onClick={() => append({ name: "" })}
-                  className="bg-[#ebe6dd] text-gray-800 px-3 py-1 rounded-2xl whitespace-nowrap shadow-2xl"
+                  className="bg-[#ebe6dd] text-gray-800 px-4 py-2 rounded-2xl whitespace-nowrap  shadow-outer text-sm font-medium font-montserrat"
                 >
                   + Add new person
                 </button>
@@ -135,9 +172,10 @@ const CreateKitty = () => {
             </div>
 
             {/* Submit */}
+
             <button
               type="submit"
-              className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300"
+              className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn"
             >
               Create Kitty
             </button>
@@ -154,7 +192,7 @@ const CreateKitty = () => {
             <button
               type="button"
               onClick={getRandomExample}
-              className="mt-3 bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl  hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 inset-shadow-2xs"
+              className="mt-3 bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl  hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 inset-shadow-2xs shadow-btn"
             >
               New example
             </button>
