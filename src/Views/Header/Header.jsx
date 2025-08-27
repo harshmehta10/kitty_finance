@@ -12,7 +12,7 @@ const Header = ({ eventName }) => {
         </Link>
         <div>
           <h1 className="font-normal font-montserrat text-white text-xl">
-            {eventName}
+            {eventName ? eventName : "Loading..."}
           </h1>
         </div>
         <div>

@@ -1,49 +1,42 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import supabase from "../supabase/supabaseClient";
-import Header from "../Views/Header/Header";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import supabase from "../supabase/supabaseClient"; // adjust import path
+import Header from "../Views/Header/Header"; // ✅ reuse your Header component
 
 const AddExpense = () => {
   const { eventId } = useParams();
   const [event, setEvent] = useState(null);
-  const [participants, setParticipants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // fetch event by id
   useEffect(() => {
     const fetchEvent = async () => {
-      const { data, error } = await supabase
-        .from("events")
-        .select("*")
-        .eq("id", eventId)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("events")
+          .select("*")
+          .eq("id", eventId)
+          .single();
 
-      if (!error) setEvent(data);
+        if (error) throw error;
+        setEvent(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const fetchParticipants = async () => {
-      const { data, error } = await supabase
-        .from("participants")
-        .select("*")
-        .eq("event_id", eventId);
-
-      if (!error) setParticipants(data);
-    };
-
-    fetchEvent();
-    fetchParticipants();
+    if (eventId) fetchEvent();
   }, [eventId]);
-  return (
-    <div className="bg-[#dfebed] h-screen">
-      <Header eventName={event?.event_name} />
 
-      <div className="p-4">
-        <h2 className="text-lg font-bold">Participants</h2>
-        <ul className="list-disc ml-6">
-          {participants.map((p) => (
-            <li key={p.id}>{p.name}</li>
-          ))}
-        </ul>
-      </div>
+  if (loading) return <p className="text-center mt-4">Loading...</p>;
+  if (error) return <p className="text-center mt-4 text-red-500">{error}</p>;
+
+  return (
+    <div>
+      <Header eventName={event?.event_name} />
     </div>
   );
 };

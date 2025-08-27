@@ -15,7 +15,7 @@ const CreatedKitty = () => {
   const navigate = useNavigate();
 
   const handleAddExpense = () => {
-    navigate(`/add-expense/${event}`);
+    navigate(`/addexpense/${event.id}`);
   };
 
   useEffect(() => {
