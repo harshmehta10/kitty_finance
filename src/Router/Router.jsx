@@ -40,7 +40,7 @@ const Router = () => {
           ),
         },
         {
-          path: "/add-expense/:eventId",
+          path: "/addexpense/:eventId",
           element: (
             <Suspense fallback={<Loader />}>
               <AddExpensesPage />
