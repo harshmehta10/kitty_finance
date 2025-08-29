@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import supabase from "../supabase/supabaseClient";
 import Header from "../Views/Header/Header";
 import back from "../assets/back.svg";
 
 const AddExpense = () => {
   const { eventId } = useParams();
+  const navigate = useNavigate();
+  const [expenseAdded, setExpenseAdded] = useState(false);
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,11 +15,11 @@ const AddExpense = () => {
   const [paidBy, setPaidBy] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [splitOption, setSplitOption] = useState("equal"); // default split
+  const [splitOption, setSplitOption] = useState("equal");
   const [customSplits, setCustomSplits] = useState({});
   const [date, setDate] = useState("");
 
-  // 🔹 Fetch event & participants
+  // fetch event & participants
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -49,17 +51,13 @@ const AddExpense = () => {
     if (eventId) fetchEvent();
   }, [eventId]);
 
-  // 🔹 Set default "paidBy" once participants are loaded
+  // set default payer
   useEffect(() => {
     if (participants.length > 0 && !paidBy) {
       setPaidBy(participants[0].id);
     }
   }, [participants, paidBy]);
 
-  if (loading) return <p className="text-center mt-4">Loading...</p>;
-  if (error) return <p className="text-center mt-4 text-red-500">{error}</p>;
-
-  // 🔹 Reset form helper
   const resetForm = () => {
     setDescription("");
     setAmount("");
@@ -69,7 +67,7 @@ const AddExpense = () => {
     setPaidBy(participants.length > 0 ? participants[0].id : "");
   };
 
-  // 🔹 Handle submit
+  // submit
   const handleAddExpense = async (e) => {
     e.preventDefault();
 
@@ -79,7 +77,7 @@ const AddExpense = () => {
     }
 
     try {
-      // 1️⃣ Insert expense
+      // insert expense
       const { data: expenseData, error: expenseError } = await supabase
         .from("expenses")
         .insert([
@@ -98,24 +96,19 @@ const AddExpense = () => {
 
       if (expenseError) throw expenseError;
 
-      // 2️⃣ Handle splits
+      // insert splits
       if (splitOption === "equal") {
         const equalAmount = Number(amount) / participants.length;
-
         const splits = participants.map((p) => ({
           expense_id: expenseData.id,
           participant_id: p.id,
           amount: equalAmount,
         }));
-
         const { error: splitError } = await supabase
           .from("expense_splits")
           .insert(splits);
-
         if (splitError) throw splitError;
-      }
-
-      if (splitOption === "different") {
+      } else if (splitOption === "different") {
         const splits = Object.entries(customSplits).map(
           ([participantId, amt]) => ({
             expense_id: expenseData.id,
@@ -123,15 +116,15 @@ const AddExpense = () => {
             amount: Number(amt),
           })
         );
-
         const { error: splitError } = await supabase
           .from("expense_splits")
           .insert(splits);
-
         if (splitError) throw splitError;
       }
 
+      console.log("Expense added:", expenseData);
       alert("Expense added successfully!");
+      setExpenseAdded(true);
       resetForm();
     } catch (err) {
       console.error(err.message);
@@ -139,17 +132,30 @@ const AddExpense = () => {
     }
   };
 
+  if (loading) return <p className="text-center mt-4">Loading...</p>;
+  if (error) return <p className="text-center mt-4 text-red-500">{error}</p>;
+
   return (
     <div className="bg-[#dfebed] min-h-screen">
       <Header eventName={event?.event_name} />
       <div className="container mx-auto px-6 lg:px-12 py-10 max-w-[700px] space-y-5">
         <div>
-          <Link to={`/created-kitty/${eventId}`}>
-            <button className="hover:cursor-pointer text-base lg:text-lg font-medium font-raleway text-[#a369ab] flex gap-1 items-center">
+          {!expenseAdded ? (
+            <Link to={`/created-kitty/${eventId}`}>
+              <button className="hover:cursor-pointer text-base lg:text-lg font-medium font-raleway text-[#a369ab] flex gap-1 items-center">
+                <img src={back} alt="back icon" className="size-3 lg:size-5" />
+                <p>Back</p>
+              </button>
+            </Link>
+          ) : (
+            <button
+              onClick={() => navigate(`/events/${eventId}/overview`)}
+              className="hover:cursor-pointer text-base lg:text-lg font-medium font-raleway text-[#a369ab] flex gap-1 items-center"
+            >
               <img src={back} alt="back icon" className="size-3 lg:size-5" />
               <p>Back</p>
             </button>
-          </Link>
+          )}
         </div>
         <div className="bg-white px-5 py-4 rounded-2xl shadow2">
           <div className="bg-[#fcfbfa] py-1 ">

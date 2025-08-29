@@ -7,6 +7,7 @@ import Home from "../Views/Pages/Home/Home";
 import Expense from "../Views/Pages/Expenses/Expense";
 import CreatedKitty from "../Components/CreatedKitty";
 import AddExpensesPage from "../Views/Pages/AddExpenses/AddExpensesPage";
+import Result from "../Views/Pages/Resut/Result";
 
 const Router = () => {
   const router = createBrowserRouter([
@@ -44,6 +45,14 @@ const Router = () => {
           element: (
             <Suspense fallback={<Loader />}>
               <AddExpensesPage />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/events/:eventId/Overview",
+          element: (
+            <Suspense fallback={<Loader />}>
+              <Result />
             </Suspense>
           ),
         },
