@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import supabase from "../supabase/supabaseClient";
 import Header from "../Views/Header/Header";
 import back from "../assets/back.svg";
+import Loader from "../Views/Layout/Loader/Loader";
 
 const AddExpense = () => {
   const { eventId } = useParams();
@@ -132,7 +133,12 @@ const AddExpense = () => {
     }
   };
 
-  if (loading) return <p className="text-center mt-4">Loading...</p>;
+  if (loading)
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   if (error) return <p className="text-center mt-4 text-red-500">{error}</p>;
 
   return (

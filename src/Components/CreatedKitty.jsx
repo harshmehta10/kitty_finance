@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import supabase from "../supabase/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import Header from "../Views/Header/Header";
+import Loader from "../Views/Layout/Loader/Loader";
 
 const CreatedKitty = () => {
   const { kittyId } = useParams();
@@ -51,7 +52,12 @@ const CreatedKitty = () => {
     fetchEventAndParticipants();
   }, [kittyId]);
 
-  if (loading) return <p>Loading event...</p>;
+  if (loading)
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   if (error) return <p>Error: {error}</p>;
 
   return (

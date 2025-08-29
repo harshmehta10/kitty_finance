@@ -1,13 +1,16 @@
 import React, { Suspense } from "react";
+import { lazy } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "../Views/Layout/Layout";
 import Loader from "../Views/Layout/Loader/Loader";
 import Error from "../Views/Layout/Loader/Error";
-import Home from "../Views/Pages/Home/Home";
-import Expense from "../Views/Pages/Expenses/Expense";
-import CreatedKitty from "../Components/CreatedKitty";
-import AddExpensesPage from "../Views/Pages/AddExpenses/AddExpensesPage";
-import Result from "../Views/Pages/Resut/Result";
+const Home = lazy(() => import("../Views/Pages/Home/Home"));
+const Expense = lazy(() => import("../Views/Pages/Expenses/Expense"));
+const CreatedKitty = lazy(() => import("../Components/CreatedKitty"));
+const AddExpensesPage = lazy(() =>
+  import("../Views/Pages/AddExpenses/AddExpensesPage")
+);
+const Result = lazy(() => import("../Views/Pages/Resut/Result"));
 
 const Router = () => {
   const router = createBrowserRouter([

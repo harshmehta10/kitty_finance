@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import supabase from "../supabase/supabaseClient";
 import Header from "../Views/Header/Header"; // you were already using this
+import Loader from "../Views/Layout/Loader/Loader";
 
 const fmt = (n) => (Number(n) || 0).toFixed(2);
 const INR = (n) => `₹${fmt(n)}`;
@@ -143,7 +144,12 @@ const Overview = () => {
     return moves;
   }, [participantBalances]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -166,15 +172,23 @@ const Overview = () => {
             </p>
           </div>
           <div className="py-4 px-6 space-y-2">
-            <p className="font-montserrat text-lg">
-              This event cost the group: {INR(totalCost)}
-            </p>
-            <p className="font-montserrat text-lg">
-              Your share (cost to you): {INR(yourShare)}
-            </p>
-            <p className="font-montserrat text-lg">
-              You’ve paid: {INR(youPaid)}
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="font-montserrat text-lg">
+                This event cost the group:
+              </p>
+              <p className="font-montserrat text-lg">{INR(totalCost)}</p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className="font-montserrat text-lg">
+                Your share (cost to you):
+              </p>
+              <p className="font-montserrat text-lg">{INR(yourShare)}</p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className="font-montserrat text-lg">You’ve paid:</p>
+              <p className="font-montserrat text-lg">{INR(youPaid)}</p>
+            </div>
+
             <p className="font-montserrat text-lg">
               {yourBalance > 0
                 ? `You should receive: ${INR(yourBalance)}`
@@ -183,12 +197,9 @@ const Overview = () => {
                 : "You are settled 🎉"}
             </p>
           </div>
-          <div className="flex justify-center pb-4">
+          <div className="flex justify-center pb-5 pt-2">
             <button className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn">
               View expenses
-            </button>
-            <button className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn">
-              Edit expenses
             </button>
           </div>
         </div>
