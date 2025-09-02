@@ -146,22 +146,12 @@ const AddExpense = () => {
       <Header eventName={event?.event_name} />
       <div className="container mx-auto px-6 lg:px-12 py-10 max-w-[700px] space-y-5">
         <div>
-          {!expenseAdded ? (
-            <Link to={`/created-kitty/${eventId}`}>
-              <button className="hover:cursor-pointer text-base lg:text-lg font-medium font-raleway text-[#a369ab] flex gap-1 items-center">
-                <img src={back} alt="back icon" className="size-3 lg:size-5" />
-                <p>Back</p>
-              </button>
-            </Link>
-          ) : (
-            <button
-              onClick={() => navigate(`/events/${eventId}/overview`)}
-              className="hover:cursor-pointer text-base lg:text-lg font-medium font-raleway text-[#a369ab] flex gap-1 items-center"
-            >
+          <Link to={`/created-kitty/${eventId}`}>
+            <button className="hover:cursor-pointer text-base lg:text-lg font-medium font-raleway text-[#a369ab] flex gap-1 items-center">
               <img src={back} alt="back icon" className="size-3 lg:size-5" />
               <p>Back</p>
             </button>
-          )}
+          </Link>
         </div>
         <div className="bg-white px-5 py-4 rounded-2xl shadow2">
           <div className="bg-[#fcfbfa] py-1 ">
@@ -268,16 +258,22 @@ const AddExpense = () => {
               <div className="flex items-center gap-2">
                 <button
                   type="submit"
-                  className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn"
+                  className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn  hover:translate-y-1"
                 >
                   Add
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-[#ebe6dd] text-gray-800 px-4 py-2 rounded-2xl whitespace-nowrap shadow-outer text-sm font-medium font-montserrat"
+                  className="bg-[#ebe6dd] text-gray-800 px-4 py-2 rounded-2xl whitespace-nowrap shadow-outer text-sm font-medium font-montserrat hover:scale-105 cursor-pointer transition duration-300 hover:translate-y-1"
                 >
                   Cancel
+                </button>
+                <button
+                  onClick={() => navigate(`/events/${eventId}/overview`)}
+                  className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn hover:scale-105 hover:translate-y-1"
+                >
+                  Split
                 </button>
               </div>
             </form>

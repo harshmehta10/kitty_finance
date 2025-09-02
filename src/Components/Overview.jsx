@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import supabase from "../supabase/supabaseClient";
 import Header from "../Views/Header/Header"; // you were already using this
 import Loader from "../Views/Layout/Loader/Loader";
@@ -9,12 +9,12 @@ const INR = (n) => `₹${fmt(n)}`;
 
 const Overview = () => {
   const { eventId } = useParams();
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [eventData, setEventData] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [markSettlements, setMarkSettlements] = useState("");
 
   useEffect(() => {
     let alive = true;
@@ -154,7 +154,6 @@ const Overview = () => {
 
   return (
     <div>
-      {/* 👇 FIX: eventData instead of event */}
       <Header eventName={eventData?.event_name} />
 
       <div className="container mx-auto px-12 py-5 max-w-[700px]">
@@ -189,18 +188,27 @@ const Overview = () => {
               <p className="font-montserrat text-lg">{INR(youPaid)}</p>
             </div>
 
-            <p className="font-montserrat text-lg">
-              {yourBalance > 0
-                ? `You should receive: ${INR(yourBalance)}`
-                : yourBalance < 0
-                ? `You owe: ${INR(-yourBalance)}`
-                : "You are settled 🎉"}
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="font-montserrat text-lg">
+                {yourBalance > 0
+                  ? "You should receive:"
+                  : yourBalance < 0
+                  ? "You owe:"
+                  : "You are settled 🎉"}
+              </p>
+              {yourBalance !== 0 && (
+                <p className="font-montserrat text-lg">
+                  {yourBalance > 0 ? INR(yourBalance) : INR(-yourBalance)}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex justify-center pb-5 pt-2">
-            <button className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn">
-              View expenses
-            </button>
+            <Link to={`/events/${eventId}/ViewExpenses`}>
+              <button className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn">
+                View expenses
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -225,8 +233,11 @@ const Overview = () => {
             )}
           </div>
           <div className="flex justify-center pb-4">
-            <button className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn">
-              Mark as settled
+            <button
+              onClick={() => setMarkSettlements("settled")}
+              className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn"
+            >
+              {markSettlements === "settled" ? "Settled" : "Mark as settled"}
             </button>
           </div>
         </div>

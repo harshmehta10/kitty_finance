@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "../Views/Layout/Layout";
 import Loader from "../Views/Layout/Loader/Loader";
 import Error from "../Views/Layout/Loader/Error";
+import AllExpenses from "../Views/Pages/AllExpenses/AllExpenses";
 const Home = lazy(() => import("../Views/Pages/Home/Home"));
 const Expense = lazy(() => import("../Views/Pages/Expenses/Expense"));
 const CreatedKitty = lazy(() => import("../Components/CreatedKitty"));
@@ -56,6 +57,14 @@ const Router = () => {
           element: (
             <Suspense fallback={<Loader />}>
               <Result />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/events/:eventId/ViewExpenses",
+          element: (
+            <Suspense fallback={<Loader />}>
+              <AllExpenses />
             </Suspense>
           ),
         },
