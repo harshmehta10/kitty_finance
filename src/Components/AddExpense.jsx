@@ -19,6 +19,7 @@ const AddExpense = () => {
   const [splitOption, setSplitOption] = useState("equal");
   const [customSplits, setCustomSplits] = useState({});
   const [date, setDate] = useState("");
+  const [expenses, setExpenses] = useState([]);
 
   // fetch event & participants
   useEffect(() => {
@@ -51,6 +52,26 @@ const AddExpense = () => {
 
     if (eventId) fetchEvent();
   }, [eventId]);
+
+  // Fetch expenses whenever the component mounts or eventId changes
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("expenses")
+          .select("*")
+          .eq("event_id", eventId);
+
+        if (error) throw error;
+
+        setExpenses(data || []);
+      } catch (err) {
+        console.error("Error fetching expenses:", err.message);
+      }
+    };
+
+    if (eventId) fetchExpenses();
+  }, [eventId, expenseAdded]); // re-fetch when a new expense is added
 
   // set default payer
   useEffect(() => {
@@ -269,12 +290,15 @@ const AddExpense = () => {
                 >
                   Cancel
                 </button>
-                <button
-                  onClick={() => navigate(`/events/${eventId}/overview`)}
-                  className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn hover:scale-105 hover:translate-y-1"
-                >
-                  Split
-                </button>
+                {expenses && expenses.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/events/${eventId}/overview`)}
+                    className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn hover:scale-105 hover:translate-y-1"
+                  >
+                    Split
+                  </button>
+                )}
               </div>
             </form>
           </div>

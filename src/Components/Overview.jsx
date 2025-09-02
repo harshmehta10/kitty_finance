@@ -222,20 +222,43 @@ const Overview = () => {
             </p>
           </div>
           <div className="py-4 px-6 space-y-2">
-            {settlements.length === 0 ? (
+            <div
+              className={`transition-opacity duration-500 ${
+                settlements.length === 0 || markSettlements === "settled"
+                  ? "opacity-100"
+                  : "opacity-0 h-0 overflow-hidden"
+              }`}
+            >
               <p className="font-montserrat text-lg">Everyone is settled 🎉</p>
-            ) : (
-              settlements.map((s, idx) => (
+            </div>
+
+            <div
+              className={`transition-opacity duration-500 ${
+                settlements.length > 0 && markSettlements !== "settled"
+                  ? "opacity-100"
+                  : "opacity-0 h-0 overflow-hidden"
+              }`}
+            >
+              {settlements.map((s, idx) => (
                 <p key={idx} className="font-montserrat text-lg">
                   {s.from} gives {INR(s.amount)} to {s.to}
                 </p>
-              ))
-            )}
+              ))}
+            </div>
           </div>
+
           <div className="flex justify-center pb-4">
             <button
-              onClick={() => setMarkSettlements("settled")}
-              className="bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn"
+              onClick={() =>
+                setMarkSettlements(
+                  markSettlements === "settled" ? "unsettled" : "settled"
+                )
+              }
+              className={`bg-[#a2e3ef] text-[#174953] text-sm font-medium font-montserrat px-4 py-2 rounded-4xl hover:cursor-pointer hover:bg-[#91d1e6] transition duration-300 shadow-btn
+      transform
+      ${markSettlements === "settled" ? "scale-105" : "scale-100"}
+      active:scale-95
+    `}
             >
               {markSettlements === "settled" ? "Settled" : "Mark as settled"}
             </button>
